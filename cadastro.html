@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ficha para Cadastro</title>
+
+<style>
+  :root{
+    --brand-red:#e30915;
+    --bg:#f4f4f4;
+    --surface:#ffffff;
+    --text:#111827;
+    --muted:#6b7280;
+    --border:#e5e7eb;
+    --shadow:0 10px 28px rgba(17,24,39,.08);
+    --radius:14px;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    font-family: Inter, system-ui, -apple-system, "Helvetica Neue", Arial;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  a{ color: inherit; }
+
+  .wrap{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  .topbar{
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 10px 16px;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:10px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .social{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .social a{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:32px;
+    height:32px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background:#fff;
+    text-decoration:none;
+    transition: all .2s ease;
+  }
+  .social a:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 8px 16px rgba(17,24,39,.10);
+  }
+  .social img{
+    width:16px;
+    height:16px;
+    display:block;
+  }
+
+  .header{
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ✅ TÍTULO CENTRALIZADO DE VERDADE (logo à esquerda) */
+  .header-inner{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 14px 16px;
+
+    display:grid;
+    grid-template-columns: 1fr auto 1fr; /* esquerda | centro | direita */
+    align-items:center;
+    gap:14px;
+  }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    min-width: 240px;
+    justify-self: start;
+  }
+
+  .logo-img{
+    width: 160px;
+    max-width: 42vw;
+    height: auto;
+    display:block;
+  }
+
+  .header-title{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    min-width: 260px;
+    justify-self: center;
+    text-align:center;
+  }
+
+  h1{
+    margin:0;
+    font-size: 18px;
+    line-height: 1.2;
+    font-weight: 800;
+  }
+
+  .card{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 18px;
+    margin-top: 16px;
+  }
+
+  .subline{
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.35;
+    text-align:center;
+  }
+
+  h2{
+    margin:0 0 10px;
+    font-size:16px;
+  }
+
+  .form-grid{
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap:12px;
+  }
+
+  .form-grid .f{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+
+  .form-grid label{
+    font-size:13px;
+    font-weight:800;
+    color: var(--text);
+  }
+
+  .form-grid input,
+  .form-grid select,
+  .form-grid textarea{
+    padding:10px 12px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:#fff;
+    font-size:14px;
+    outline:none;
+  }
+
+  .form-grid input:focus,
+  .form-grid select:focus,
+  .form-grid textarea:focus{
+    border-color: rgba(227,9,21,.45);
+    box-shadow: 0 0 0 4px rgba(227,9,21,.10);
+  }
+
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 800;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    text-decoration:none;
+    cursor:pointer;
+    transition: all .2s ease;
+    user-select:none;
+    white-space:nowrap;
+  }
+
+  .btn-green{
+    background:#16a34a;
+    border-color:#16a34a;
+    color:#fff;
+  }
+  .btn-green:hover{
+    background:#15803d;
+    border-color:#15803d;
+    box-shadow: 0 10px 18px rgba(22,163,74,.28);
+    transform: translateY(-1px);
+  }
+
+  .btn:active{ transform: translateY(0); box-shadow:none; }
+
+  .btn:disabled{
+    opacity:.65;
+    cursor:not-allowed;
+    transform:none;
+    box-shadow:none;
+  }
+
+  .hint{
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  @media (max-width: 768px){
+    .header-inner{
+      grid-template-columns: 1fr;
+      justify-items:center;
+      text-align:center;
+    }
+    .brand{ min-width: unset; }
+    .header-title{ min-width: unset; }
+    .logo-img{ width: 140px; }
+    h1{ font-size: 16px; }
+
+    .form-grid{ grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <div class="topbar-inner">
+      <span>Sapporo nas redes sociais</span>
+      <div class="social">
+        <a href="https://www.facebook.com/sapporoalimentos/?locale=pt_BR" target="_blank" rel="noopener">
+          <img src="../assets/img/facebook.svg" alt="Facebook">
+        </a>
+        <a href="https://www.instagram.com/sapporooficial/" target="_blank" rel="noopener">
+          <img src="../assets/img/instagram.svg" alt="Instagram">
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <img src="../assets/img/sapporo.png" alt="Sapporo" class="logo-img">
+      </div>
+
+      <div class="header-title">
+        <h1>Ficha para Cadastro</h1>
+        <p class="subline" id="sub-origem"></p>
+      </div>
+
+      <!-- coluna da direita vazia propositalmente (mantém o título centralizado) -->
+      <div></div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="card">
+      <h2>Cadastro da Loja</h2>
+
+      <form id="form-loja" class="form-grid" autocomplete="on">
+        <div class="f">
+          <label>Nome da loja*</label>
+          <input name="loja" required placeholder="Ex.: Mercado do João" />
+        </div>
+
+        <div class="f">
+          <label>CNPJ*</label>
+          <input id="cnpj" name="cnpj" required placeholder="00.000.000/0000-00" inputmode="numeric" />
+          <small id="cnpj-erro" style="display:none;color:#b91c1c;font-weight:800;font-size:12px;margin-top:2px">
+            CNPJ inválido. Verifique e tente novamente.
+          </small>
+          <div class="hint">Aceita com ou sem pontuação. Ex.: 00123456000189</div>
+        </div>
+
+        <div class="f">
+          <label>Responsável*</label>
+          <input name="responsavel" required placeholder="Nome e sobrenome" />
+        </div>
+
+        <div class="f">
+          <label>WhatsApp*</label>
+          <input name="whatsapp" required placeholder="(11) 99999-9999" inputmode="numeric" />
+        </div>
+
+        <div class="f">
+          <label>E-mail*</label>
+          <input name="email" type="email" required placeholder="voce@loja.com" />
+        </div>
+
+        <div class="f">
+          <label>Cidade*</label>
+          <input name="cidade" required placeholder="Ex.: Guarulhos" />
+        </div>
+
+        <div class="f">
+          <label>UF*</label>
+          <select name="uf" required>
+            <option value="">Selecione</option>
+            <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option>
+            <option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option>
+            <option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option>
+            <option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+            <option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SE</option>
+            <option>SP</option><option>TO</option>
+          </select>
+        </div>
+
+        <div class="f" style="grid-column:1/-1">
+          <label>Observações</label>
+          <textarea name="obs" rows="3" placeholder="Ex.: melhor horário para contato..."></textarea>
+        </div>
+
+        <!-- Honeypot anti-spam (oculto) -->
+        <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0">
+
+        <div style="grid-column:1/-1; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <button class="btn btn-green" type="submit" id="btn-enviar">📩 Enviar cadastro</button>
+          <span id="form-status" style="color:var(--muted);font-size:13px"></span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+<script>
+  // ✅ Endpoint do seu Apps Script (Web App /exec)
+  const CADASTRO_ENDPOINT = "https://script.google.com/macros/s/AKfycbxaQPDmwhCoDfkWTvsV2k9f9lir7xOLB0r4QRS_rjVSXNFvNq_go_7eku2wKLG32y2-uw/exec";
+
+  const params = new URLSearchParams(window.location.search);
+  const origem = (params.get("origem") || "DESCONHECIDO").toUpperCase();
+
+  function guessOrigemFromReferrer() {
+  const ref = (document.referrer || "").toLowerCase();
+  if (!ref) return "";
+
+  if (ref.includes("/varejista")) return "VAREJISTA";
+  if (ref.includes("/distribuidor")) return "DISTRIBUIDOR";
+  if (ref.includes("/cif")) return "CIF";
+  return "";
+}
+
+let origemFinal = origem;
+if (origemFinal === "DESCONHECIDO") {
+  const guessed = guessOrigemFromReferrer();
+  if (guessed) origemFinal = guessed;
+}
+
+
+
+  const ufTabela = params.get("uf"); // opcional
+
+  // Mostrar a origem no subtítulo (fica elegante e ajuda suporte)
+  const sub = document.getElementById("sub-origem");
+  if (sub) sub.textContent = origemFinal !== "DESCONHECIDO" ? `Origem: ${origemFinal}` : "";
+
+  function onlyDigits(v){ return String(v || "").replace(/\D+/g, ""); }
+
+  function isValidCNPJ(input){
+    const cnpj = onlyDigits(input);
+    if (cnpj.length !== 14) return false;
+    if (/^(\d)\1{13}$/.test(cnpj)) return false;
+
+    const calcDV = (base, weights) => {
+      let sum = 0;
+      for (let i = 0; i < weights.length; i++){
+        sum += parseInt(base.charAt(i), 10) * weights[i];
+      }
+      const mod = sum % 11;
+      return (mod < 2) ? 0 : (11 - mod);
+    };
+
+    const w1 = [5,4,3,2,9,8,7,6,5,4,3,2];
+    const w2 = [6,5,4,3,2,9,8,7,6,5,4,3,2];
+
+    const base12 = cnpj.slice(0, 12);
+    const dv1 = calcDV(base12, w1);
+    const base13 = base12 + String(dv1);
+    const dv2 = calcDV(base13, w2);
+
+    return cnpj === (base12 + String(dv1) + String(dv2));
+  }
+
+  // ✅ Máscara com cursor correto
+  (function setupCNPJ(){
+    const cnpjEl = document.getElementById("cnpj");
+    if (!cnpjEl) return;
+
+    function maskCNPJ(d){
+      d = d.slice(0, 14);
+      return d
+        .replace(/^(\d{2})(\d)/, "$1.$2")
+        .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+        .replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3/$4")
+        .replace(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d)/, "$1.$2.$3/$4-$5");
+    }
+
+    cnpjEl.addEventListener("input", (e) => {
+      const input = e.target;
+
+      const cursorPos = input.selectionStart || 0;
+      const digitsBefore = onlyDigits(input.value.slice(0, cursorPos)).length;
+
+      const digits = onlyDigits(input.value);
+      const masked = maskCNPJ(digits);
+
+      input.value = masked;
+
+      let newPos = 0;
+      let digitsCount = 0;
+      while (newPos < masked.length && digitsCount < digitsBefore) {
+        if (/\d/.test(masked[newPos])) digitsCount++;
+        newPos++;
+      }
+      input.setSelectionRange(newPos, newPos);
+
+      const err = document.getElementById("cnpj-erro");
+      if (err) err.style.display = "none";
+      input.style.borderColor = "";
+      input.style.boxShadow = "";
+    });
+
+    cnpjEl.addEventListener("blur", () => {
+      const err = document.getElementById("cnpj-erro");
+      const ok = isValidCNPJ(cnpjEl.value);
+
+      if (!ok){
+        if (err) err.style.display = "block";
+        cnpjEl.style.borderColor = "#ef4444";
+        cnpjEl.style.boxShadow = "0 0 0 4px rgba(239,68,68,.12)";
+      } else {
+        if (err) err.style.display = "none";
+        cnpjEl.style.borderColor = "";
+        cnpjEl.style.boxShadow = "";
+      }
+    });
+  })();
+
+  document.getElementById("form-loja")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const form = e.currentTarget;
+    const status = document.getElementById("form-status");
+    const btn = document.getElementById("btn-enviar");
+    const cnpjEl = document.getElementById("cnpj");
+    const err = document.getElementById("cnpj-erro");
+
+    // honeypot anti-spam
+    const hp = form.querySelector('input[name="website"]')?.value?.trim();
+    if (hp) return;
+
+    // ✅ valida antes de enviar
+    const cnpjOk = isValidCNPJ(cnpjEl?.value || "");
+    if (!cnpjOk){
+      if (err) err.style.display = "block";
+      if (cnpjEl){
+        cnpjEl.focus();
+        cnpjEl.style.borderColor = "#ef4444";
+        cnpjEl.style.boxShadow = "0 0 0 4px rgba(239,68,68,.12)";
+      }
+      status.textContent = "❌ Corrija o CNPJ para enviar.";
+      return;
+    }
+
+    status.textContent = "Enviando...";
+    btn.disabled = true;
+
+    const fd = new FormData(form);
+
+    // ✅ NOVO: origem do cadastro (VAREJISTA / DISTRIBUIDOR / CIF)
+    fd.append("origem", origemFinal);
+
+    // ✅ opcional: uf da tabela (se vier na URL)
+    if (ufTabela) fd.append("uf_tabela", String(ufTabela).toUpperCase());
+
+    // ✅ opcional: auditoria de onde veio (ajuda suporte)
+    fd.append("referrer", document.referrer || "");
+
+    console.log("ORIGEM ENVIADA:", origem);
+    console.log("UF_TABELA ENVIADA:", ufTabela);
+    console.log("ENDPOINT:", CADASTRO_ENDPOINT);
+
+
+
+
+    try {
+      // Mantendo no-cors para evitar "Failed to fetch" por CORS
+      await fetch(CADASTRO_ENDPOINT, {
+        method: "POST",
+        mode: "no-cors",
+        body: fd,
+      });
+
+      status.textContent = "✅ Cadastro enviado! Em breve entraremos em contato.";
+      form.reset();
+
+      if (cnpjEl){
+        cnpjEl.style.borderColor = "";
+        cnpjEl.style.boxShadow = "";
+      }
+      if (err) err.style.display = "none";
+    } catch (err) {
+      console.error(err);
+      status.textContent = "❌ Não foi possível enviar. Tente novamente em alguns instantes.";
+    } finally {
+      btn.disabled = false;
+    }
+  });
+</script>
+
+</body>
+</html>

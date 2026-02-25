@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tabela de Preços</title>
+
+<style>
+  :root{
+    --brand-red:#e30915;
+    --bg:#f4f4f4;
+    --surface:#ffffff;
+    --text:#111827;
+    --muted:#6b7280;
+    --border:#e5e7eb;
+    --shadow:0 10px 28px rgba(17,24,39,.08);
+    --radius:14px;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    font-family: Inter, system-ui, -apple-system, "Helvetica Neue", Arial;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  a{ color: inherit; }
+
+  .wrap{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  .topbar{
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 10px 16px;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:10px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .social{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .social a{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:32px;
+    height:32px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background:#fff;
+    text-decoration:none;
+    transition: all .2s ease;
+  }
+  .social a:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 8px 16px rgba(17,24,39,.10);
+  }
+  .social img{
+    width:16px;
+    height:16px;
+    display:block;
+  }
+
+  .header{
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .header-inner{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 14px 16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    min-width: 240px;
+  }
+  .logo-img{
+    width: 160px;
+    max-width: 42vw;
+    height: auto;
+    display:block;
+  }
+  .header-title{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    min-width: 260px;
+  }
+  h1{
+    margin:0;
+    font-size: 18px;
+    line-height: 1.2;
+    font-weight: 800;
+  }
+
+  .actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding: 9px 14px;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    text-decoration:none;
+    cursor:pointer;
+    transition: all .2s ease;
+    user-select:none;
+    white-space:nowrap;
+  }
+
+  .btn-outline-red{
+    background:#fff;
+    color: var(--brand-red);
+    border-color: var(--brand-red);
+  }
+  .btn-outline-red:hover{
+    background: var(--brand-red);
+    color:#fff;
+    box-shadow: 0 10px 18px rgba(227,9,21,.25);
+    transform: translateY(-1px);
+  }
+
+  .btn-green{
+    background:#16a34a;
+    border-color:#16a34a;
+    color:#fff;
+  }
+  .btn-green:hover{
+    background:#15803d;
+    border-color:#15803d;
+    box-shadow: 0 10px 18px rgba(22,163,74,.28);
+    transform: translateY(-1px);
+  }
+
+  .btn:active{ transform: translateY(0); box-shadow:none; }
+
+  .btn:disabled{
+    opacity:.65;
+    cursor:not-allowed;
+    transform:none;
+    box-shadow:none;
+  }
+
+  .card{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 14px;
+    margin-top: 16px;
+  }
+  .bullets{
+    margin:0;
+    padding:0;
+    list-style:none;
+    display:grid;
+    gap:8px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.35;
+  }
+  .bullets a{
+    color: var(--brand-red);
+    text-decoration: none;
+    font-weight: 700;
+  }
+  .bullets a:hover{ text-decoration: underline; }
+
+  .loading{
+    padding: 30px;
+    text-align:center;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  /* sem scroll interno */
+  #conteudo{
+    overflow-x: visible;
+  }
+
+  table{
+    width:100%;
+    border-collapse: separate;
+    border-spacing:0;
+    background: var(--surface);
+  }
+
+  /* ✅ Cabeçalho arredondado e “cortado” de forma estável */
+  thead tr{
+    background: var(--brand-red);
+    overflow: hidden;
+  }
+
+  thead th{
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    border-radius: 8px;
+    background: var(--brand-red); /* ✅ importante */
+    color: #fff;
+    font-weight: 800;
+    font-size: 13px;
+    text-align:center;
+    padding: 12px 10px;
+    border-bottom: 1px solid rgba(255,255,255,.20);
+  }
+
+  tbody td{
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  tbody tr:nth-child(even){ background:#fff; }
+  tbody tr:hover{ background:#fafafa; }
+
+  .valor{ text-align:center; white-space:nowrap; }
+  td strong{ color: var(--text); }
+
+  .col-codigo{
+    text-align:center;
+    white-space:nowrap;
+  }
+
+  .col-produto{
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+  }
+
+  .footer-note{
+    display:flex;
+    gap:10px;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 12px;
+    padding: 0 2px;
+  }
+
+  @media (max-width: 768px){
+    .header-inner{
+      align-items:flex-start;
+      flex-direction:column;
+    }
+    .actions{ width:100%; justify-content:flex-start; }
+    .logo-img{ width: 140px; }
+    h1{ font-size: 16px; }
+
+    tbody td{ font-size: 13px; padding: 10px 8px; }
+    thead th{ font-size: 12px; padding: 10px 8px; }
+
+    .col-codigo{
+      display:none;
+    }
+  }
+
+  /* =========================
+   TOOLTIP DE IMAGEM (PRODUTO)
+   ========================= */
+
+  .prod-tooltip{
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    text-decoration: none; /* remove sublinhado */
+    transition: color .15s ease;
+  }
+
+  .prod-tooltip:hover{
+    color: var(--brand-red); /* feedback visual clean */
+  }
+
+  .prod-tooltip:focus{
+    outline: none;
+  }
+
+  .prod-tooltip:focus-visible{
+    outline: 2px solid rgba(227,9,21,.35);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  .tooltip-img{
+    position: absolute;
+    left: 0;
+    top: 120%;
+    width: 240px;
+    max-width: min(72vw, 240px);
+    background: #fff;
+    border: 1px solid rgba(17,24,39,.12);
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 14px 32px rgba(17,24,39,.14);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: .15s ease;
+    z-index: 9999;
+    pointer-events: none; /* evita tremida */
+  }
+
+  .tooltip-img img{
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 10px;
+  }
+
+  .tooltip-img .tooltip-caption{
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.2;
+  }
+
+  .prod-tooltip:hover .tooltip-img,
+  .prod-tooltip:focus .tooltip-img{
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  /* =========================
+     DESCONTO GERAL
+     ========================= */
+
+  .discount-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .discount-left{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    min-width: 280px;
+  }
+  .discount-title{
+    font-weight:800;
+    font-size:14px;
+    color: var(--text);
+  }
+  .discount-help{
+    font-size:12px;
+    color: var(--muted);
+    line-height:1.25;
+  }
+  .discount-controls{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  .discount-input{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding: 10px 12px;
+    box-shadow: 0 8px 18px rgba(17,24,39,.05);
+  }
+  .discount-input label{
+    font-size:13px;
+    color: var(--muted);
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .discount-input input{
+    width:110px;
+    border:0;
+    outline:0;
+    font-size:14px;
+    font-weight:800;
+    color: var(--text);
+    text-align:right;
+    background:transparent;
+  }
+  .pill{
+    font-size:12px;
+    font-weight:800;
+    color:#fff;
+    background: var(--brand-red);
+    padding: 6px 10px;
+    border-radius: 999px;
+    white-space:nowrap;
+  }
+
+  /* input desconto por linha */
+  .inp-desconto{
+    width: 92px;
+    max-width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 13px;
+    text-align: right;
+    outline: none;
+    background:#fff;
+  }
+  .inp-desconto:focus{
+    border-color: rgba(227,9,21,.55);
+    box-shadow: 0 0 0 4px rgba(227,9,21,.12);
+  }
+</style>
+
+</head>
+
+<body>
+
+  <div class="topbar">
+    <div class="topbar-inner">
+      <span>Sapporo nas redes sociais</span>
+      <div class="social">
+        <a href="https://www.facebook.com/sapporoalimentos/?locale=pt_BR" target="_blank" rel="noopener">
+          <img src="../assets/img/facebook.svg" alt="Facebook">
+        </a>
+        <a href="https://www.instagram.com/sapporooficial/" target="_blank" rel="noopener">
+          <img src="../assets/img/instagram.svg" alt="Instagram">
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <img src="../assets/img/sapporo.png" alt="Sapporo" class="logo-img">
+      </div>
+
+      <div class="header-title">
+        <h1 id="titulo-estado">Tabela de Preços Varejista</h1>
+      </div>
+
+      <div class="actions">
+        <a href="index.html" class="btn btn-outline-red">← Trocar estado</a>
+        <button id="btn-exportar" class="btn btn-green">⬇️ Baixar planilha Excel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <div class="card">
+      <ul class="bullets">
+        <li><b>•</b> Valores calculados automaticamente conforme a tributação do estado.</li>
+        <li><b>•</b> Para cadastro dos produtos, <strong>baixe a planilha</strong>, que já contém todas as informações necessárias.</li>
+        <li><b>•</b> Dúvidas: fale com
+          <a href="https://api.whatsapp.com/send?phone=551176162242&text=Quero%20mais%20informações%20%28Site%20Sapporo%29" target="_blank" rel="noopener">Mayumi</a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- ✅ NOVO: DESCONTO GERAL -->
+    <div class="card" id="card-desconto" style="display:none;">
+      <div class="discount-row">
+        <div class="discount-left">
+          <div class="discount-title">Desconto do cliente</div>
+          <div class="discount-help">
+            Preencha a porcentagem abaixo para aplicar em <b>todos</b> os produtos desta tabela.
+            Você também pode ajustar o desconto individualmente por item.
+          </div>
+        </div>
+
+        <div class="discount-controls">
+          <div class="discount-input">
+            <label for="desconto-geral">Desconto (%)</label>
+            <input id="desconto-geral" type="text" inputmode="decimal" placeholder="ex: 10,5">
+          </div>
+
+          <span class="pill" id="pill-desconto">0%</span>
+
+          <button class="btn btn-outline-red" id="btn-limpar-desconto" type="button">
+            Limpar desconto
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="conteudo" class="card loading">Carregando dados…</div>
+
+    <div class="footer-note">
+      <div>Valores calculados automaticamente com base nas alíquotas vigentes. Última atualização conforme base administrativa.</div>
+      <div>Observação: o cálculo aplica ICMS + IVA diretamente sobre o preço base.</div>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+
+<script>
+const SHEET_URL = "https://opensheet.elk.sh/1j2KHRhrNJCy_gNS3gdaUvwQX3LacU3OmyaSKujMN7Dw/MAYUMI";
+
+function getEstadoFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('uf');
+}
+
+const uf = getEstadoFromURL()?.toUpperCase();
+
+const estados = {
+  AC: 'Acre', AL: 'Alagoas', AP: 'Amapá', AM: 'Amazonas', BA: 'Bahia', CE: 'Ceará', DF: 'Distrito Federal',
+  ES: 'Espírito Santo', GO: 'Goiás', MA: 'Maranhão', MT: 'Mato Grosso', MS: 'Mato Grosso do Sul', MG: 'Minas Gerais',
+  PA: 'Pará', PB: 'Paraíba', PR: 'Paraná', PE: 'Pernambuco', PI: 'Piauí', RJ: 'Rio de Janeiro', RN: 'Rio Grande do Norte',
+  RS: 'Rio Grande do Sul', RO: 'Rondônia', RR: 'Roraima', SC: 'Santa Catarina', SPSN: 'São Paulo - Regime Simples',
+  SPRN: 'São Paulo - Regime Normal', SP: 'São Paulo', SE: 'Sergipe', TO: 'Tocantins'
+};
+
+if (uf && estados[uf]) {
+  document.getElementById('titulo-estado').innerText =
+    `Tabela de Preços Varejista – ${estados[uf]} (${uf})`;
+} else {
+  document.getElementById('titulo-estado').innerText = 'Tabela de Preços';
+
+  document.getElementById('conteudo').innerHTML = `
+    <div style="padding:18px;text-align:center">
+      <p style="font-size:14px;color:var(--muted);margin:0 0 10px">
+        Selecione um estado para visualizar a tabela de preços.
+      </p>
+      <a href="index.html" class="btn btn-outline-red" style="justify-content:center">
+        Selecionar estado
+      </a>
+    </div>
+  `;
+}
+
+/* =========================
+   DESCONTO (GERAL + POR ITEM)
+   ========================= */
+
+// chave do localStorage por UF
+function descontoKey(){
+  return `desconto_geral_${(uf || "semuf").toLowerCase()}`;
+}
+
+// converte texto em número (aceita vírgula)
+function parsePct(v){
+  const n = parseFloat(String(v ?? "").trim().replace(",", "."));
+  if (Number.isNaN(n)) return 0;
+  return Math.max(0, Math.min(100, n));
+}
+
+function formatPct(n){
+  // mostra 0,00 quando tiver decimal, mas não força
+  const hasDecimal = Math.abs(n - Math.round(n)) > 1e-9;
+  return hasDecimal ? n.toFixed(2).replace(".", ",") : String(Math.round(n));
+}
+
+function aplicarDescontoGeralNaTabela(pct){
+  document.querySelectorAll(".inp-desconto").forEach(inp => {
+    inp.value = pct ? formatPct(pct) : "";
+  });
+  document.querySelectorAll("tbody tr").forEach(tr => recalcularLinha(tr));
+}
+
+function atualizarPill(pct){
+  document.getElementById("pill-desconto").textContent = `${formatPct(pct)}%`;
+}
+
+function initDescontoGeral(){
+  const card = document.getElementById("card-desconto");
+  const inp  = document.getElementById("desconto-geral");
+  const btn  = document.getElementById("btn-limpar-desconto");
+
+  // mostra card só quando estiver em UF válida
+  if (uf && estados[uf]) card.style.display = "";
+
+  // carrega desconto salvo
+  const salvo = parsePct(localStorage.getItem(descontoKey()));
+  if (salvo) inp.value = formatPct(salvo);
+  atualizarPill(salvo);
+
+  // ao digitar: salva, aplica e recalcula
+  inp.addEventListener("input", () => {
+    const pct = parsePct(inp.value);
+    atualizarPill(pct);
+    localStorage.setItem(descontoKey(), String(pct));
+    aplicarDescontoGeralNaTabela(pct);
+  });
+
+  // limpar
+  btn.addEventListener("click", () => {
+    inp.value = "";
+    atualizarPill(0);
+    localStorage.removeItem(descontoKey());
+    aplicarDescontoGeralNaTabela(0);
+  });
+}
+
+/* =========================
+   CÁLCULO
+   ========================= */
+
+function calcularPreco(precoBase, aliqInter, iva, aliqDest) {
+  const valor1 = (precoBase + (precoBase * iva)) * aliqDest;
+  const valor2 = precoBase * aliqInter;
+  return precoBase + (valor1 - valor2);
+}
+
+// aplica desconto ANTES do imposto (recomendado)
+function calcularPrecoComDesconto(precoBase, descontoPct, aliqInter, iva, aliqDest){
+  const fator = 1 - (descontoPct / 100);
+  const baseDesc = precoBase * fator;
+  return calcularPreco(baseDesc, aliqInter, iva, aliqDest);
+}
+
+/* ================================
+   TOOLTIP: como obter o link da foto
+   ================================ */
+function getImagemUrl(row){
+  const candidatos = [
+    row.imagem_url
+  ].filter(Boolean);
+
+  if (candidatos.length) return String(candidatos[0]).trim();
+  return "";
+}
+
+function escapeHtml(str){
+  return String(str ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+/* ======= FUNÇÃO DO CÓDIGO DA MEMÓRIA (COMPLETA) ======= */
+function baixarPlanilhaXLSX() {
+  if (!uf) {
+    alert("Selecione um estado válido.");
+    return;
+  }
+
+  // ✅ pega as linhas reais da tabela na tela (com descontos por item)
+  const trs = Array.from(document.querySelectorAll("table tbody tr"));
+  if (trs.length === 0) {
+    alert("A tabela ainda não foi carregada.");
+    return;
+  }
+
+  const nomeEstado = estados[uf] || uf;
+
+  // Data + hora (sem segundos)
+  const agora = new Date();
+  const dataHora =
+    agora.toLocaleDateString("pt-BR") +
+    " às " +
+    agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+  const linhas = [];
+
+  // Cabeçalho visual (3 linhas + 1 em branco)
+  linhas.push([`Tabela de Preços Varejista – ${nomeEstado} (${uf})`]);
+  linhas.push(["Valores calculados automaticamente conforme o estado"]);
+  linhas.push([`Gerado em: ${dataHora}`]);
+  linhas.push([]);
+
+  // ✅ Cabeçalho da tabela (com Desconto)
+  linhas.push([
+    "Código",
+    "Produto",
+    "EAN (Cód. de Barras)",
+    "Preço Base (R$)",
+    "Desconto (%)",
+    "NCM (Classificação Fiscal)",
+    "CEST",
+    "Alíq. Inter. (%)",
+    "IVA (%)",
+    "ST (%)",
+    "Preço Final (R$)",
+    "Qtd. por Caixa",
+    "DUN (Código de Barras)",
+    "Validade (dias)",
+  ]);
+
+  // ✅ Para manter as colunas extras (EAN/NCM/CEST etc.) como você já tinha,
+  // vamos buscar o "row original" pelo código usando dadosGlobais
+  const mapPorCodigo = new Map();
+  (dadosGlobais || []).forEach(r => {
+    const key = String(r.codigo ?? "").trim();
+    if (key) mapPorCodigo.set(key, r);
+  });
+
+  // ✅ varre cada linha visível e usa o desconto do input daquela linha
+  trs.forEach(tr => {
+    const codigo = String(tr.querySelector(".col-codigo")?.textContent ?? "").trim();
+
+    const row = mapPorCodigo.get(codigo) || {}; // fallback se não achar
+
+    const precoBase = parseFloat(tr.getAttribute("data-preco-base") || "0");
+    const aliqInter = parseFloat(tr.getAttribute("data-aliq-inter") || "0");
+    const iva       = parseFloat(tr.getAttribute("data-iva") || "0");
+    const aliqDest  = parseFloat(tr.getAttribute("data-aliq-dest") || "0");
+
+    if (
+      Number.isNaN(precoBase) ||
+      Number.isNaN(aliqInter) ||
+      Number.isNaN(iva) ||
+      Number.isNaN(aliqDest)
+    ) return;
+
+    // ✅ desconto por item (B)
+    const descontoPct = parsePct(tr.querySelector(".inp-desconto")?.value || "");
+    const precoFinal = calcularPrecoComDesconto(precoBase, descontoPct, aliqInter, iva, aliqDest);
+
+    const precoBaseNum = Number(precoBase.toFixed(2));
+    const precoFinalNum = Number(precoFinal.toFixed(2));
+
+    const eanTxt = row.ean ? String(row.ean) : "";
+    const dunTxt = row.dun ? String(row.dun) : "";
+
+    linhas.push([
+      row.codigo ?? codigo,
+      row.produto || "",
+
+      eanTxt,
+      precoBaseNum,
+
+      descontoPct / 100, // fração para Excel formatar %
+
+      row.ncm || "",
+      row.cest || "",
+
+      aliqInter,  // fração
+      iva,        // fração
+      aliqDest,   // fração
+
+      precoFinalNum,
+
+      row.quantd_caixa ?? "",
+      dunTxt,
+      row.validade_em_dias ?? "",
+    ]);
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(linhas);
+
+  // --- Mesclas do cabeçalho (A até N) ---
+  ws["!merges"] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 13 } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 13 } },
+    { s: { r: 2, c: 0 }, e: { r: 2, c: 13 } },
+    { s: { r: 3, c: 0 }, e: { r: 3, c: 13 } },
+  ];
+
+  // --- Larguras ---
+  ws["!cols"] = [
+    { wch: 8 },  // Código
+    { wch: 54 }, // Produto
+    { wch: 18 }, // EAN
+    { wch: 14 }, // Preço Base
+    { wch: 12 }, // Desconto
+    { wch: 18 }, // NCM
+    { wch: 12 }, // CEST
+    { wch: 12 }, // Aliq Inter
+    { wch: 10 }, // IVA
+    { wch: 10 }, // ST
+    { wch: 14 }, // Preço Final
+    { wch: 10 }, // Qtd/Caixa
+    { wch: 18 }, // DUN
+    { wch: 12 }, // Validade
+  ];
+
+  // --- Estilos (xlsx-js-style) ---
+  const headerBg = "E30915";
+  const grid = "D1D5DB";
+  const dark = "111827";
+  const muted = "374151";
+  const muted2 = "6B7280";
+
+  const borderThin = {
+    top: { style: "thin", color: { rgb: grid } },
+    bottom: { style: "thin", color: { rgb: grid } },
+    left: { style: "thin", color: { rgb: grid } },
+    right: { style: "thin", color: { rgb: grid } },
+  };
+
+  function setStyle(addr, patch) {
+    if (!ws[addr]) return;
+
+    ws[addr].s = ws[addr].s || {};
+    ws[addr].s = {
+      ...ws[addr].s,
+      ...patch,
+      font: { ...(ws[addr].s.font || {}), ...(patch.font || {}) },
+      alignment: { ...(ws[addr].s.alignment || {}), ...(patch.alignment || {}) },
+      fill: patch.fill !== undefined ? patch.fill : ws[addr].s.fill,
+      border: patch.border || ws[addr].s.border,
+    };
+  }
+
+  // Título
+  setStyle(XLSX.utils.encode_cell({ r: 0, c: 0 }), {
+    font: { bold: true, sz: 16, color: { rgb: dark } },
+    alignment: { horizontal: "center", vertical: "center" },
+  });
+
+  // Subtítulo
+  setStyle(XLSX.utils.encode_cell({ r: 1, c: 0 }), {
+    font: { sz: 11, color: { rgb: muted } },
+    alignment: { horizontal: "center", vertical: "center" },
+  });
+
+  // Data/hora
+  setStyle(XLSX.utils.encode_cell({ r: 2, c: 0 }), {
+    font: { sz: 10, italic: true, color: { rgb: muted2 } },
+    alignment: { horizontal: "center", vertical: "center" },
+  });
+
+  // Cabeçalho da tabela (linha 4)
+  const headerRow = 4;
+  for (let C = 0; C <= 13; C++) {
+    const addr = XLSX.utils.encode_cell({ r: headerRow, c: C });
+    setStyle(addr, {
+      font: { bold: true, color: { rgb: "FFFFFF" }, sz: 12 },
+      fill: { patternType: "solid", fgColor: { rgb: headerBg } },
+      alignment: { horizontal: "center", vertical: "center", wrapText: true },
+      border: borderThin,
+    });
+  }
+
+  // Range completo
+  const range = XLSX.utils.decode_range(ws["!ref"]);
+
+  // Formatos: moeda e percentuais
+  for (let R = 5; R <= range.e.r; R++) {
+    // Moeda: Preço Base (col 3) e Preço Final (col 10)
+    const cBase = XLSX.utils.encode_cell({ r: R, c: 3 });
+    if (ws[cBase]) ws[cBase].z = '"R$" #,##0.00';
+
+    const cFinal = XLSX.utils.encode_cell({ r: R, c: 10 });
+    if (ws[cFinal]) ws[cFinal].z = '"R$" #,##0.00';
+
+    // Percentuais: Desconto (4), AliqInter (7), IVA (8), ST (9)
+    for (const C of [4, 7, 8, 9]) {
+      const addr = XLSX.utils.encode_cell({ r: R, c: C });
+      if (ws[addr]) ws[addr].z = "0.00%";
+    }
+  }
+
+  // Alinhamentos e bordas
+  for (let R = range.s.r; R <= range.e.r; R++) {
+    for (let C = range.s.c; C <= range.e.c; C++) {
+      const addr = XLSX.utils.encode_cell({ r: R, c: C });
+      if (!ws[addr]) continue;
+
+      ws[addr].s = ws[addr].s || {};
+      ws[addr].s.border = ws[addr].s.border || borderThin;
+
+      // não mexe nas 4 linhas do topo
+      if (R < 4) continue;
+      if (R === 4) continue; // cabeçalho já foi
+
+      let horizontal = "left";
+
+      // Produto, EAN, DUN → esquerda
+      if ([1, 2, 12].includes(C)) horizontal = "left";
+
+      // NCM/CEST → centro
+      if ([5, 6].includes(C)) horizontal = "center";
+
+      // Numéricos → direita
+      if ([0, 3, 4, 7, 8, 9, 10, 11, 13].includes(C)) horizontal = "right";
+
+      setStyle(addr, {
+        alignment: { horizontal, vertical: "center" },
+        font: { sz: 11, color: { rgb: dark } },
+      });
+    }
+  }
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Tabela de Preços");
+  XLSX.writeFile(wb, `tabela_precos_varejista_${uf}.xlsx`);
+}
+
+/* ======= FIM DA FUNÇÃO DO CÓDIGO DA MEMÓRIA ======= */
+
+const conteudo = document.getElementById("conteudo");
+conteudo.classList.add("loading");
+
+let dadosGlobais = [];
+
+function recalcularLinha(tr){
+  if (!tr) return;
+
+  const precoBase = parseFloat(tr.getAttribute("data-preco-base") || "0");
+  const aliqInter = parseFloat(tr.getAttribute("data-aliq-inter") || "0");
+  const iva       = parseFloat(tr.getAttribute("data-iva") || "0");
+  const aliqDest  = parseFloat(tr.getAttribute("data-aliq-dest") || "0");
+
+  const inp = tr.querySelector(".inp-desconto");
+  const descontoPct = parsePct(inp?.value || "");
+
+  // recalcula
+  const precoFinal = calcularPrecoComDesconto(precoBase, descontoPct, aliqInter, iva, aliqDest);
+
+  // atualiza célula final
+  const tdFinal = tr.querySelector(".td-preco-final");
+  if (tdFinal) tdFinal.innerHTML = `<strong>R$ ${precoFinal.toFixed(2)}</strong>`;
+}
+
+if (uf && estados[uf]) {
+  fetch(SHEET_URL)
+    .then(res => res.json())
+    .then(dados => {
+      dadosGlobais = dados;
+
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th class="col-codigo">Código</th>
+              <th>Produto</th>
+              <th>Preço base</th>
+              <th>Desconto (%)</th>
+              <th>Preço final</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      const ufSheet = uf.toLowerCase();
+      let linhasRenderizadas = 0;
+
+      dados.forEach(row => {
+        const precoBase = parseFloat(row.precobase);
+
+        const aliqInter = parseFloat(row[`aliqinter_${ufSheet}`]) / 100;
+        const iva       = parseFloat(row[`iva_${ufSheet}`]) / 100;
+        const aliqDest  = parseFloat(row[`aliqdest_${ufSheet}`]) / 100;
+
+        if (isNaN(aliqInter) || isNaN(iva) || isNaN(aliqDest) || isNaN(precoBase)) return;
+
+        linhasRenderizadas++;
+
+        const nomeProduto = row.produto ?? "";
+        const imgUrl = getImagemUrl(row);
+
+        const produtoHtml = imgUrl
+          ? `
+            <span class="prod-tooltip" tabindex="0" aria-label="Ver foto do produto">
+              ${escapeHtml(nomeProduto)}
+              <span class="tooltip-img" role="tooltip">
+                <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(nomeProduto)}" loading="lazy" />
+                <div class="tooltip-caption">Foto do produto</div>
+              </span>
+            </span>
+          `
+          : escapeHtml(nomeProduto);
+
+        // desconto inicial (do geral salvo)
+        const descontoInicial = parsePct(localStorage.getItem(descontoKey()));
+
+        const precoFinal = calcularPrecoComDesconto(precoBase, descontoInicial, aliqInter, iva, aliqDest);
+
+        html += `
+          <tr
+            data-preco-base="${precoBase}"
+            data-aliq-inter="${aliqInter}"
+            data-iva="${iva}"
+            data-aliq-dest="${aliqDest}"
+          >
+            <td class="col-codigo">${escapeHtml(row.codigo ?? "")}</td>
+            <td class="col-produto">${produtoHtml}</td>
+            <td class="valor">R$ ${precoBase.toFixed(2)}</td>
+
+            <td class="valor">
+              <input class="inp-desconto" type="text" inputmode="decimal" placeholder="0"
+                value="${descontoInicial ? formatPct(descontoInicial) : ""}">
+            </td>
+
+            <td class="valor td-preco-final"><strong>R$ ${precoFinal.toFixed(2)}</strong></td>
+          </tr>
+        `;
+      });
+
+      if (linhasRenderizadas === 0) {
+        conteudo.classList.remove("loading");
+        conteudo.innerHTML = "Nenhum produto disponível para este estado.";
+        return;
+      }
+
+      html += "</tbody></table>";
+      conteudo.classList.remove("loading");
+      conteudo.innerHTML = html;
+
+      // ✅ inicializa UI do desconto geral (e aplica se tiver)
+      initDescontoGeral();
+
+      // ✅ se já tiver desconto salvo, garante aplicar em todas as linhas
+      const salvo = parsePct(localStorage.getItem(descontoKey()));
+      if (salvo) aplicarDescontoGeralNaTabela(salvo);
+    })
+    .catch(err => {
+      conteudo.innerText = "Erro ao carregar dados da planilha.";
+      console.error(err);
+    });
+}
+
+// recalcular quando digitar desconto por item
+document.addEventListener("input", (e) => {
+  if (e.target.classList.contains("inp-desconto")) {
+    const tr = e.target.closest("tr");
+    recalcularLinha(tr);
+  }
+});
+
+document.getElementById("btn-exportar")
+  ?.addEventListener("click", baixarPlanilhaXLSX);
+</script>
+
+</body>
+</html>
+

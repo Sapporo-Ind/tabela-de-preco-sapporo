@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tabela de Preços</title>
+
+<style>
+  :root{
+    --brand-red:#e30915;
+    --bg:#f4f4f4;
+    --surface:#ffffff;
+    --text:#111827;
+    --muted:#6b7280;
+    --border:#e5e7eb;
+    --shadow:0 10px 28px rgba(17,24,39,.08);
+    --radius:14px;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    font-family: Inter, system-ui, -apple-system, "Helvetica Neue", Arial;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  a{ color: inherit; }
+
+  .wrap{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  .topbar{
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 10px 16px;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:10px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .social{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .social a{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:32px;
+    height:32px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background:#fff;
+    text-decoration:none;
+    transition: all .2s ease;
+  }
+  .social a:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 8px 16px rgba(17,24,39,.10);
+  }
+  .social img{
+    width:16px;
+    height:16px;
+    display:block;
+  }
+
+  .header{
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .header-inner{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 14px 16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    min-width: 240px;
+  }
+  .logo-img{
+    width: 160px;
+    max-width: 42vw;
+    height: auto;
+    display:block;
+  }
+  .header-title{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    min-width: 260px;
+  }
+  h1{
+    margin:0;
+    font-size: 18px;
+    line-height: 1.2;
+    font-weight: 800;
+  }
+
+  .actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding: 9px 14px;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    text-decoration:none;
+    cursor:pointer;
+    transition: all .2s ease;
+    user-select:none;
+    white-space:nowrap;
+  }
+
+  .btn-outline-red{
+    background:#fff;
+    color: var(--brand-red);
+    border-color: var(--brand-red);
+  }
+  .btn-outline-red:hover{
+    background: var(--brand-red);
+    color:#fff;
+    box-shadow: 0 10px 18px rgba(227,9,21,.25);
+    transform: translateY(-1px);
+  }
+
+  .btn-green{
+    background:#16a34a;
+    border-color:#16a34a;
+    color:#fff;
+  }
+  .btn-green:hover{
+    background:#15803d;
+    border-color:#15803d;
+    box-shadow: 0 10px 18px rgba(22,163,74,.28);
+    transform: translateY(-1px);
+  }
+
+  .btn:active{ transform: translateY(0); box-shadow:none; }
+
+  .btn:disabled{
+    opacity:.65;
+    cursor:not-allowed;
+    transform:none;
+    box-shadow:none;
+  }
+
+  .card{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 14px;
+    margin-top: 16px;
+  }
+  .bullets{
+    margin:0;
+    padding:0;
+    list-style:none;
+    display:grid;
+    gap:8px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.35;
+  }
+  .bullets a{
+    color: var(--brand-red);
+    text-decoration: none;
+    font-weight: 700;
+  }
+  .bullets a:hover{ text-decoration: underline; }
+
+  .loading{
+    padding: 30px;
+    text-align:center;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  /* sem scroll interno */
+  #conteudo{
+    overflow-x: visible;
+  }
+
+  table{
+    width:100%;
+    border-collapse: separate;
+    border-spacing:0;
+    background: var(--surface);
+  }
+
+  /* ✅ Cabeçalho arredondado e “cortado” de forma estável */
+  thead tr{
+    background: var(--brand-red);
+    
+    overflow: hidden;
+  }
+
+  thead th{
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    border-radius: 8px;
+    background: var(--brand-red); /* ✅ importante */
+    color: #fff;
+    font-weight: 800;
+    font-size: 13px;
+    text-align:center;
+    padding: 12px 10px;
+    border-bottom: 1px solid rgba(255,255,255,.20);
+  }
+
+  tbody td{
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  tbody tr:nth-child(even){ background:#fff; }
+  tbody tr:hover{ background:#fafafa; }
+
+  .valor{ text-align:center; white-space:nowrap; }
+  td strong{ color: var(--text); }
+
+  .col-codigo{
+    text-align:center;
+    white-space:nowrap;
+  }
+
+  .col-produto{
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+  }
+
+  .footer-note{
+    display:flex;
+    gap:10px;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 12px;
+    padding: 0 2px;
+  }
+
+  @media (max-width: 768px){
+    .header-inner{
+      align-items:flex-start;
+      flex-direction:column;
+    }
+    .actions{ width:100%; justify-content:flex-start; }
+    .logo-img{ width: 140px; }
+    h1{ font-size: 16px; }
+
+    tbody td{ font-size: 13px; padding: 10px 8px; }
+    thead th{ font-size: 12px; padding: 10px 8px; }
+
+    .col-codigo{
+      display:none;
+    }
+  }
+
+  /* =========================
+   TOOLTIP DE IMAGEM (PRODUTO)
+   ========================= */
+
+.prod-tooltip{
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  text-decoration: none; /* remove sublinhado */
+  transition: color .15s ease;
+}
+
+.prod-tooltip:hover{
+  color: var(--brand-red); /* feedback visual clean */
+}
+
+.prod-tooltip:focus{
+  outline: none;
+}
+
+.prod-tooltip:focus-visible{
+  outline: 2px solid rgba(227,9,21,.35);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.tooltip-img{
+  position: absolute;
+  left: 0;
+  top: 120%;
+  width: 240px;
+  max-width: min(72vw, 240px);
+  background: #fff;
+  border: 1px solid rgba(17,24,39,.12);
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 14px 32px rgba(17,24,39,.14);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: .15s ease;
+  z-index: 9999;
+  pointer-events: none; /* evita tremida */
+}
+
+.tooltip-img img{
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 10px;
+}
+
+.tooltip-img .tooltip-caption{
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.2;
+}
+
+.prod-tooltip:hover .tooltip-img,
+.prod-tooltip:focus .tooltip-img{
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+</style>
+
+</head>
+
+<body>
+
+  <div class="topbar">
+    <div class="topbar-inner">
+      <span>Sapporo nas redes sociais</span>
+      <div class="social">
+        <a href="https://www.facebook.com/sapporoalimentos/?locale=pt_BR" target="_blank" rel="noopener">
+          <img src="../assets/img/facebook.svg" alt="Facebook">
+        </a>
+        <a href="https://www.instagram.com/sapporooficial/" target="_blank" rel="noopener">
+          <img src="../assets/img/instagram.svg" alt="Instagram">
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <img src="../assets/img/sapporo.png" alt="Sapporo" class="logo-img">
+      </div>
+
+      <div class="header-title">
+        <h1 id="titulo-estado">Tabela de Preços CIF</h1>
+      </div>
+
+      <div class="actions">
+        <a href="index.html" class="btn btn-outline-red">← Trocar estado</a>
+        <button id="btn-exportar" class="btn btn-green">⬇️ Baixar planilha Excel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <div class="card">
+      <ul class="bullets">
+        <li><b>•</b> Valores calculados automaticamente conforme a tributação do estado.</li>
+        <li><b>•</b> Para cadastrar a sua Loja, preencha o Formulário clicando <a href="../cadastro.html" target="_blank" rel="noopener">Aqui</a>.</li>
+        <li><b>•</b> Para cadastro dos produtos, <strong>baixe a planilha</strong>, que já contém todas as informações necessárias.</li>
+        <li><b>•</b> Valores válidos para pedidos mínimos de <strong>R$ 3.000,00</strong> — Frete CIF (Remetente paga o Frete).</li>
+        <li><b>•</b> Compras sem valor mínimo somente na <a href="https://loja.sapporo.com.br" target="_blank" rel="noopener">Loja online</a>.</li>
+        <li><b>•</b> Dúvidas: fale com
+          <a href="https://api.whatsapp.com/send?phone=5511947922506&text=Quero%20mais%20informações%20%28Site%20Sapporo%29" target="_blank" rel="noopener">Ana</a>
+          ou
+          <a href="https://api.whatsapp.com/send?phone=5511947903094&text=Quero%20mais%20informações%20%28Site%20Sapporo%29" target="_blank" rel="noopener">Alexandra</a>.
+        </li>
+      </ul>
+    </div>
+
+    <div id="conteudo" class="card loading">Carregando dados…</div>
+
+    <div class="footer-note">
+      <div>Valores calculados automaticamente com base nas alíquotas vigentes. Última atualização conforme base administrativa.</div>
+      <div>Observação: o cálculo aplica ICMS + IVA diretamente sobre o preço base.</div>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+
+<script>
+const SHEET_URL = "https://opensheet.elk.sh/1j2KHRhrNJCy_gNS3gdaUvwQX3LacU3OmyaSKujMN7Dw/CIF";
+
+// 🔖 Identificação da origem desta tabela
+const ORIGEM_SITE = "DISTRIBUIDOR";
+
+function getEstadoFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('uf');
+}
+
+const uf = getEstadoFromURL()?.toUpperCase();
+
+function montarLinkCadastro() {
+  const link = document.getElementById("link-cadastro");
+  if (!link) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const u = (params.get("uf") || "").toUpperCase();
+
+  link.href = `../cadastro.html?origem=${encodeURIComponent(ORIGEM_SITE)}&uf=${encodeURIComponent(u)}`;
+}
+  
+// garante que roda assim que o DOM estiver pronto
+document.addEventListener("DOMContentLoaded", montarLinkCadastro);
+
+const estados = {
+  AC: 'Acre', AL: 'Alagoas', AP: 'Amapá', AM: 'Amazonas', BA: 'Bahia', CE: 'Ceará', DF: 'Distrito Federal',
+  ES: 'Espírito Santo', GO: 'Goiás', MA: 'Maranhão', MT: 'Mato Grosso', MS: 'Mato Grosso do Sul', MG: 'Minas Gerais',
+  PA: 'Pará', PB: 'Paraíba', PR: 'Paraná', PE: 'Pernambuco', PI: 'Piauí', RJ: 'Rio de Janeiro', RN: 'Rio Grande do Norte',
+  RS: 'Rio Grande do Sul', RO: 'Rondônia', RR: 'Roraima', SC: 'Santa Catarina', SPSN: 'São Paulo - Regime Simples',
+  SPRN: 'São Paulo - Regime Normal', SE: 'Sergipe', TO: 'Tocantins'
+};
+
+if (uf && estados[uf]) {
+  document.getElementById('titulo-estado').innerText =
+    `Tabela de Preços CIF – ${estados[uf]} (${uf})`;
+} else {
+  document.getElementById('titulo-estado').innerText = 'Tabela de Preços';
+
+  document.getElementById('conteudo').innerHTML = `
+    <div style="padding:18px;text-align:center">
+      <p style="font-size:14px;color:var(--muted);margin:0 0 10px">
+        Selecione um estado para visualizar a tabela de preços.
+      </p>
+      <a href="index.html" class="btn btn-outline-red" style="justify-content:center">
+        Selecionar estado
+      </a>
+    </div>
+  `;
+}
+
+function calcularPreco(precoBase, aliqInter, iva, aliqDest) {
+  const valor1 = (precoBase + (precoBase * iva)) * aliqDest;
+  const valor2 = precoBase * aliqInter;
+  return precoBase + (valor1 - valor2);
+}
+
+/* ================================
+   TOOLTIP: como obter o link da foto
+   ================================
+   1) Se sua planilha já tiver uma coluna com URL da imagem, use aqui.
+      Exemplos comuns: row.imagem, row.foto, row.linkimagem, row.imagem_url etc.
+      Basta ajustar a função getImagemUrl(row).
+
+   2) Se não tiver coluna ainda, dá pra usar um "padrão" por código/EAN:
+      ex.: return `https://seusite.com/produtos/${row.codigo}.jpg`;
+*/
+function getImagemUrl(row){
+  // Prioriza colunas (caso existam) — ajuste os nomes se necessário
+  const candidatos = [
+    row.imagem_url
+  ].filter(Boolean);
+
+  if (candidatos.length) return String(candidatos[0]).trim();
+
+  // Exemplo de fallback (desativado por padrão):
+  // if (row.codigo) return `https://seusite.com/imagens/${encodeURIComponent(row.codigo)}.jpg`;
+  // if (row.ean)    return `https://seusite.com/imagens/${encodeURIComponent(row.ean)}.jpg`;
+
+  return "";
+}
+
+function escapeHtml(str){
+  return String(str ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+/* ======= FUNÇÃO DO CÓDIGO DA MEMÓRIA (COMPLETA) ======= */
+function baixarPlanilhaXLSX() {
+  if (!uf || dadosGlobais.length === 0) {
+    alert("Selecione um estado válido.");
+    return;
+  }
+
+  const ufSheet = uf.toLowerCase();
+  const nomeEstado = estados[uf] || uf;
+
+  // Data + hora (sem segundos)
+  const agora = new Date();
+  const dataHora =
+    agora.toLocaleDateString("pt-BR") +
+    " às " +
+    agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+  const linhas = [];
+
+  // Cabeçalho visual (3 linhas + 1 em branco)
+  linhas.push([`Tabela de Preços CIF – ${nomeEstado} (${uf})`]);
+  linhas.push(["Valores calculados automaticamente conforme o estado"]);
+  linhas.push([`Gerado em: ${dataHora}`]);
+  linhas.push([]);
+
+  // Cabeçalho da tabela (linha 4)
+  linhas.push([
+    "Código",
+    "Produto",
+    "EAN (Cód. de Barras)",
+    "Preço Base (R$)",
+    "NCM (Classificação Fiscal)",
+    "CEST",
+    "Alíq. Inter. (%)",
+    "IVA (%)",
+    "ST (%)",
+    "Preço Final (R$)",
+    "Qtd. por Caixa",
+    "DUN (Código de Barras)",
+    "Validade (dias)",
+  ]);
+
+  // Dados
+  dadosGlobais.forEach((row) => {
+    const precoBase = parseFloat(row.precobase);
+    const aliqInter = parseFloat(row[`aliqinter_${ufSheet}`]) / 100;
+    const iva = parseFloat(row[`iva_${ufSheet}`]) / 100;
+    const aliqDest = parseFloat(row[`aliqdest_${ufSheet}`]) / 100;
+
+    if (isNaN(aliqInter) || isNaN(iva) || isNaN(aliqDest) || isNaN(precoBase)) return;
+
+    const precoFinal = calcularPreco(precoBase, aliqInter, iva, aliqDest);
+
+    // Números com 2 casas (mantém valor numérico p/ formato)
+    const precoBaseNum = Number(precoBase.toFixed(2));
+    const precoFinalNum = Number(precoFinal.toFixed(2));
+
+    // EAN/DUN como texto (preserva zeros à esquerda)
+    const eanTxt = row.ean ? String(row.ean) : "";
+    const dunTxt = row.dun ? String(row.dun) : "";
+
+    linhas.push([
+      row.codigo,
+      row.produto || "",
+      eanTxt,
+      precoBaseNum,
+      row.ncm || "",
+      row.cest || "",
+      aliqInter,     // percentual como fração (0.12) → Excel formata como %
+      iva,           // idem
+      aliqDest,      // idem (você chamou de ST no cabeçalho)
+      precoFinalNum,
+      row.quantd_caixa ?? "",
+      dunTxt,
+      row.validade_em_dias ?? "",
+    ]);
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(linhas);
+
+  // --- Mesclas do cabeçalho (A até M) ---
+  ws["!merges"] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 12 } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 12 } },
+    { s: { r: 2, c: 0 }, e: { r: 2, c: 12 } },
+    { s: { r: 3, c: 0 }, e: { r: 3, c: 12 } },
+  ];
+
+  // --- Larguras ---
+  ws["!cols"] = [
+    { wch: 8 },  // Código
+    { wch: 54 }, // Produto
+    { wch: 18 }, // EAN
+    { wch: 14 }, // Preço Base
+    { wch: 18 }, // NCM
+    { wch: 12 }, // CEST
+    { wch: 12 }, // Aliq Inter
+    { wch: 10 }, // IVA
+    { wch: 10 }, // ST
+    { wch: 14 }, // Preço Final
+    { wch: 10 }, // Qtd/Caixa
+    { wch: 18 }, // DUN
+    { wch: 12 }, // Validade
+  ];
+
+  // --- Estilos (xlsx-js-style) ---
+  const headerBg = "E30915";
+  const grid = "D1D5DB";
+  const dark = "111827";
+  const muted = "374151";
+  const muted2 = "6B7280";
+
+  const borderThin = {
+    top: { style: "thin", color: { rgb: grid } },
+    bottom: { style: "thin", color: { rgb: grid } },
+    left: { style: "thin", color: { rgb: grid } },
+    right: { style: "thin", color: { rgb: grid } },
+  };
+
+  // Helper p/ aplicar estilo sem apagar
+  function setStyle(addr, patch) {
+    if (!ws[addr]) return;
+
+    ws[addr].s = ws[addr].s || {};
+
+    ws[addr].s = {
+      ...ws[addr].s,
+      ...patch,
+      font: { ...(ws[addr].s.font || {}), ...(patch.font || {}) },
+      alignment: { ...(ws[addr].s.alignment || {}), ...(patch.alignment || {}) },
+      fill: patch.fill !== undefined ? patch.fill : ws[addr].s.fill,
+      border: patch.border || ws[addr].s.border,
+    };
+  }
+
+  // Título (r=0,c=0)
+  setStyle(XLSX.utils.encode_cell({ r: 0, c: 0 }), {
+    font: { bold: true, sz: 16, color: { rgb: dark } },
+    alignment: { horizontal: "center", vertical: "center" },
+  });
+
+  // Subtítulo (r=1,c=0)
+  setStyle(XLSX.utils.encode_cell({ r: 1, c: 0 }), {
+    font: { sz: 11, color: { rgb: muted } },
+    alignment: { horizontal: "center", vertical: "center" },
+  });
+
+  // Data/hora (r=2,c=0)
+  setStyle(XLSX.utils.encode_cell({ r: 2, c: 0 }), {
+    font: { sz: 10, italic: true, color: { rgb: muted2 } },
+    alignment: { horizontal: "center", vertical: "center" },
+  });
+
+  // Cabeçalho da tabela (linha 4)
+  const headerRow = 4;
+  for (let C = 0; C <= 12; C++) {
+    const addr = XLSX.utils.encode_cell({ r: headerRow, c: C });
+    setStyle(addr, {
+      font: { bold: true, color: { rgb: "FFFFFF" }, sz: 12 },
+      fill: { patternType: "solid", fgColor: { rgb: headerBg } },
+      alignment: { horizontal: "center", vertical: "center", wrapText: true },
+      border: borderThin,
+    });
+  }
+
+  // Range completo
+  const range = XLSX.utils.decode_range(ws["!ref"]);
+
+  // Formatos
+  // Preço Base (col 3) e Preço Final (col 9)
+  // Percentuais (cols 6,7,8)
+  for (let R = 5; R <= range.e.r; R++) {
+    // Moeda
+    const cBase = XLSX.utils.encode_cell({ r: R, c: 3 });
+    if (ws[cBase]) ws[cBase].z = '"R$" #,##0.00';
+
+    const cFinal = XLSX.utils.encode_cell({ r: R, c: 9 });
+    if (ws[cFinal]) ws[cFinal].z = '"R$" #,##0.00';
+
+    // Percentuais (como fração)
+    for (const C of [6, 7, 8]) {
+      const addr = XLSX.utils.encode_cell({ r: R, c: C });
+      if (ws[addr]) ws[addr].z = "0.00%";
+    }
+  }
+
+  // Alinhamentos por coluna + bordas em todas as células preenchidas
+  for (let R = range.s.r; R <= range.e.r; R++) {
+    for (let C = range.s.c; C <= range.e.c; C++) {
+      const addr = XLSX.utils.encode_cell({ r: R, c: C });
+      if (!ws[addr]) continue;
+
+      // Bordas gerais
+      ws[addr].s = ws[addr].s || {};
+      ws[addr].s.border = ws[addr].s.border || borderThin;
+
+      // Não mexe nas 4 primeiras linhas (título/sub/data/vazio), só borda se existir
+      if (R < 4) continue;
+
+      // Linha do cabeçalho já foi definida acima
+      if (R === 4) continue;
+
+      // Dados (R >= 5)
+      let horizontal = "left";
+
+      // Produto, EAN, DUN → esquerda
+      if ([1, 2, 11].includes(C)) horizontal = "left";
+
+      // NCM/CEST → centro
+      if ([4, 5].includes(C)) horizontal = "center";
+
+      // Numéricos → direita
+      if ([0, 3, 6, 7, 8, 9, 10, 12].includes(C)) horizontal = "right";
+
+      setStyle(addr, {
+        alignment: { horizontal, vertical: "center" },
+        font: { sz: 11, color: { rgb: dark } },
+      });
+    }
+  }
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Tabela de Preços");
+  XLSX.writeFile(wb, `tabela_precos_cif_${uf}.xlsx`);
+}
+/* ======= FIM DA FUNÇÃO DO CÓDIGO DA MEMÓRIA ======= */
+
+const conteudo = document.getElementById("conteudo");
+conteudo.classList.add("loading");
+
+let dadosGlobais = [];
+
+if (uf && estados[uf]) {
+  fetch(SHEET_URL)
+    .then(res => res.json())
+    .then(dados => {
+      dadosGlobais = dados;
+
+      // ✅ Mantido: tabela como no código da memória
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th class="col-codigo">Código</th>
+              <th>Produto</th>
+              <th>Preço base</th>
+              <th>Preço final</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      const ufSheet = uf.toLowerCase();
+      let linhasRenderizadas = 0;
+
+      dados.forEach(row => {
+        const precoBase = parseFloat(row.precobase);
+
+        const aliqInter = parseFloat(row[`aliqinter_${ufSheet}`]) / 100;
+        const iva       = parseFloat(row[`iva_${ufSheet}`]) / 100;
+        const aliqDest  = parseFloat(row[`aliqdest_${ufSheet}`]) / 100;
+
+        if (isNaN(aliqInter) || isNaN(iva) || isNaN(aliqDest) || isNaN(precoBase)) return;
+
+        linhasRenderizadas++;
+
+        const precoFinal = calcularPreco(precoBase, aliqInter, iva, aliqDest);
+
+        const nomeProduto = row.produto ?? "";
+        const imgUrl = getImagemUrl(row);
+
+        // Se tiver link de imagem, aplica tooltip. Se não, mostra só o texto.
+        const produtoHtml = imgUrl
+          ? `
+            <span class="prod-tooltip" tabindex="0" aria-label="Ver foto do produto">
+              ${escapeHtml(nomeProduto)}
+              <span class="tooltip-img" role="tooltip">
+                <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(nomeProduto)}" loading="lazy" />
+                <div class="tooltip-caption">Foto do produto</div>
+              </span>
+            </span>
+          `
+          : escapeHtml(nomeProduto);
+
+        html += `
+          <tr>
+            <td class="col-codigo">${escapeHtml(row.codigo ?? "")}</td>
+            <td class="col-produto">${produtoHtml}</td>
+            <td class="valor">R$ ${precoBase.toFixed(2)}</td>
+            <td class="valor"><strong>R$ ${precoFinal.toFixed(2)}</strong></td>
+          </tr>
+        `;
+      });
+
+
+      if (linhasRenderizadas === 0) {
+        conteudo.classList.remove("loading");
+        conteudo.innerHTML = "Nenhum produto disponível para este estado.";
+        return;
+      }
+
+      html += "</tbody></table>";
+      conteudo.classList.remove("loading");
+      conteudo.innerHTML = html;
+    })
+    .catch(err => {
+      conteudo.innerText = "Erro ao carregar dados da planilha.";
+      console.error(err);
+    });
+}
+
+document.getElementById("btn-exportar")
+  ?.addEventListener("click", baixarPlanilhaXLSX);
+</script>
+
+</body>
+</html>
+
+
+
